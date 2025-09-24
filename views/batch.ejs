@@ -1,0 +1,233 @@
+<div class="max-w-6xl mx-auto">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Batch Tracking</h1>
+        <p class="text-gray-600">Track multiple shipments at once for improved efficiency</p>
+    </div>
+
+    <!-- Back Navigation -->
+    <div class="mb-6">
+        <a href="/" class="text-blue-600 hover:text-blue-800 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Single Tracking
+        </a>
+    </div>
+
+    <!-- Error Display -->
+    <% if (error) { %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Batch Tracking Error</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <%= error %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Batch Tracking Form -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <form action="/batch" method="POST" class="space-y-6">
+            <div>
+                <label for="trackingNumbers" class="block text-sm font-medium text-gray-700 mb-2">
+                    Tracking Numbers
+                    <span class="text-gray-500 font-normal">(one per line, comma, or semicolon separated)</span>
+                </label>
+                <textarea 
+                    id="trackingNumbers" 
+                    name="trackingNumbers" 
+                    rows="8"
+                    required
+                    placeholder="Enter tracking numbers:&#10;1Z999AA1234567890&#10;123456789012&#10;MAEU1234567"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                ></textarea>
+                <p class="mt-2 text-sm text-gray-500">
+                    Supports up to 50 tracking numbers per batch
+                </p>
+            </div>
+
+            <div>
+                <label for="carrierCode" class="block text-sm font-medium text-gray-700 mb-2">
+                    Carrier (Optional - Auto-detect if not selected)
+                </label>
+                <select 
+                    id="carrierCode" 
+                    name="carrierCode"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="">Auto-detect carrier for each number</option>
+                    <% carriers.forEach(carrier => { %>
+                        <option value="<%= carrier.carrierCode %>">
+                            <%= carrier.carrierName %> (<%= carrier.carrierCode %>)
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <button 
+                type="submit"
+                class="w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium text-lg"
+            >
+                <i class="fas fa-layer-group mr-2"></i>
+                Track All Shipments
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    <% if (results) { %>
+        <div class="space-y-6">
+            <!-- Summary -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Batch Results Summary</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600"><%= results.totalRequested %></div>
+                        <div class="text-sm text-blue-800">Total Requested</div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600"><%= results.totalSuccessful %></div>
+                        <div class="text-sm text-green-800">Successfully Tracked</div>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600"><%= results.totalFailed %></div>
+                        <div class="text-sm text-red-800">Failed to Track</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Successful Results -->
+            <% if (results.results && results.results.length > 0) { %>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        Successfully Tracked Shipments
+                    </h3>
+                    <div class="space-y-4">
+                        <% results.results.forEach(result => { %>
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">
+                                            <a href="/track?number=<%= result.trackingNumber %>&carrier=<%= result.carrierCode %>" 
+                                               class="text-blue-600 hover:text-blue-800 transition-colors">
+                                                <%= result.trackingNumber %>
+                                            </a>
+                                        </h4>
+                                        <p class="text-sm text-gray-600">
+                                            <i class="fas fa-truck mr-1"></i>
+                                            <%= result.carrierName %>
+                                        </p>
+                                    </div>
+                                    <div class="mt-2 md:mt-0">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                            <% if (result.currentStatus === 'DELIVERED') { %>
+                                                bg-green-100 text-green-800
+                                            <% } else if (result.currentStatus === 'IN_TRANSIT' || result.currentStatus === 'OUT_FOR_DELIVERY') { %>
+                                                bg-blue-100 text-blue-800
+                                            <% } else if (result.currentStatus === 'EXCEPTION') { %>
+                                                bg-red-100 text-red-800
+                                            <% } else { %>
+                                                bg-gray-100 text-gray-800
+                                            <% } %>">
+                                            <%= result.currentStatus %>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <% if (result.events && result.events.length > 0) { %>
+                                    <div class="text-sm text-gray-600">
+                                        <p class="mb-1">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            Latest: <%= new Date(result.events[0].timestamp).toLocaleString() %>
+                                        </p>
+                                        <% if (result.events[0].location) { %>
+                                            <p>
+                                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                                <%= result.events[0].location %>
+                                            </p>
+                                        <% } %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Failed Results -->
+            <% if (results.errors && results.errors.length > 0) { %>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                        Failed to Track
+                    </h3>
+                    <div class="space-y-3">
+                        <% results.errors.forEach(error => { %>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-times-circle text-red-400"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="font-medium text-red-800"><%= error.trackingNumber %></p>
+                                        <p class="text-sm text-red-700"><%= error.error %></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+
+    <!-- Tips Section -->
+    <div class="bg-gray-100 rounded-lg p-6 mt-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+            Batch Tracking Tips
+        </h3>
+        <ul class="space-y-2 text-gray-700">
+            <li class="flex items-start">
+                <i class="fas fa-check text-green-500 mr-2 mt-1 text-sm"></i>
+                <span>Separate tracking numbers with line breaks, commas, or semicolons</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check text-green-500 mr-2 mt-1 text-sm"></i>
+                <span>Mix different carriers in the same batch - we'll auto-detect each one</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check text-green-500 mr-2 mt-1 text-sm"></i>
+                <span>Maximum of 50 tracking numbers per batch for optimal performance</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check text-green-500 mr-2 mt-1 text-sm"></i>
+                <span>Click on any tracking number in results to view detailed timeline</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-8 flex flex-wrap gap-4">
+        <a href="/" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+            <i class="fas fa-search mr-2"></i>
+            Single Tracking
+        </a>
+        <a href="/health" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
+            <i class="fas fa-heartbeat mr-2"></i>
+            System Health
+        </a>
+        <% if (results) { %>
+            <button onclick="window.print()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                <i class="fas fa-print mr-2"></i>
+                Print Results
+            </button>
+        <% } %>
+    </div>
+</div>

@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for the ShipSmart tracking application */
+.tracking-timeline {
+  @apply relative;
+}
+
+.tracking-timeline::before {
+  content: '';
+  @apply absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200;
+}
+
+.tracking-event {
+  @apply relative pl-16 pb-8;
+}
+
+.tracking-event:last-child {
+  @apply pb-0;
+}
+
+.tracking-event-icon {
+  @apply absolute left-0 top-1 w-12 h-12 rounded-full flex items-center justify-center text-white font-medium text-sm;
+}
+
+.status-pending {
+  @apply bg-gray-400;
+}
+
+.status-in-transit {
+  @apply bg-blue-500;
+}
+
+.status-delivered {
+  @apply bg-green-500;
+}
+
+.status-exception {
+  @apply bg-red-500;
+}
+
+.status-out-for-delivery {
+  @apply bg-orange-500;
+}
+
+/* Loading animation */
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Connection status indicator */
+.connection-indicator {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.connection-connected {
+  @apply bg-green-100 text-green-800;
+}
+
+.connection-connecting {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.connection-disconnected {
+  @apply bg-red-100 text-red-800;
+}

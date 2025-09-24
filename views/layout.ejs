@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .tracking-timeline {
+            position: relative;
+        }
+        .tracking-timeline::before {
+            content: '';
+            position: absolute;
+            left: 1.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e5e7eb;
+        }
+        .tracking-event {
+            position: relative;
+            padding-left: 4rem;
+            padding-bottom: 2rem;
+        }
+        .tracking-event:last-child {
+            padding-bottom: 0;
+        }
+        .tracking-event-icon {
+            position: absolute;
+            left: 0;
+            top: 0.25rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .status-pending { background-color: #6b7280; }
+        .status-in-transit { background-color: #3b82f6; }
+        .status-out-for-delivery { background-color: #f59e0b; }
+        .status-delivered { background-color: #10b981; }
+        .status-exception { background-color: #ef4444; }
+        .status-returned { background-color: #8b5cf6; }
+        .status-cancelled { background-color: #ef4444; }
+        
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        
+        .connection-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .connection-connected {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .connection-connecting {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .connection-disconnected {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <a href="/" class="text-3xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                        ShipSmart Tracking
+                    </a>
+                    <span class="ml-3 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                        v1.0
+                    </span>
+                </div>
+                <nav class="flex space-x-6">
+                    <a href="/" class="text-gray-600 hover:text-gray-900 transition-colors">Track</a>
+                    <a href="/batch" class="text-gray-600 hover:text-gray-900 transition-colors">Batch</a>
+                    <a href="/health" class="text-gray-600 hover:text-gray-900 transition-colors">Health</a>
+                    <a href="/api/docs" class="text-gray-600 hover:text-gray-900 transition-colors" target="_blank">API</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <%- body %>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-gray-500">
+                Built with ❤️ for the ShipSmart logistics platform
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-refresh functionality
+        function setupAutoRefresh() {
+            const refreshInterval = 30000; // 30 seconds
+            const trackingNumber = document.querySelector('[data-tracking-number]')?.dataset.trackingNumber;
+            
+            if (trackingNumber && window.location.pathname.includes('/track')) {
+                setInterval(() => {
+                    window.location.reload();
+                }, refreshInterval);
+            }
+        }
+
+        // Server-Sent Events for real-time updates
+        function setupSSE() {
+            const trackingNumber = document.querySelector('[data-tracking-number]')?.dataset.trackingNumber;
+            const carrierCode = document.querySelector('[data-carrier-code]')?.dataset.carrierCode;
+            
+            if (trackingNumber) {
+                const eventSource = new EventSource(`/events/${trackingNumber}${carrierCode ? '?carrier=' + carrierCode : ''}`);
+                
+                eventSource.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'tracking_update') {
+                            // Update the page with new data
+                            updateTrackingDisplay(data.data);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing SSE data:', error);
+                    }
+                };
+                
+                eventSource.onerror = function(error) {
+                    console.error('SSE connection error:', error);
+                    eventSource.close();
+                };
+            }
+        }
+
+        function updateTrackingDisplay(trackingData) {
+            // Update status
+            const statusElement = document.querySelector('[data-current-status]');
+            if (statusElement) {
+                statusElement.textContent = trackingData.currentStatus;
+            }
+            
+            // Update last updated time
+            const lastUpdatedElement = document.querySelector('[data-last-updated]');
+            if (lastUpdatedElement) {
+                lastUpdatedElement.textContent = new Date(trackingData.lastUpdated).toLocaleString();
+            }
+        }
+
+        // Form validation
+        function validateTrackingForm(form) {
+            const trackingNumber = form.querySelector('input[name="trackingNumber"]').value.trim();
+            if (!trackingNumber) {
+                alert('Please enter a tracking number');
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAutoRefresh();
+            setupSSE();
+            
+            // Add form validation
+            const trackingForms = document.querySelectorAll('form[data-tracking-form]');
+            trackingForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    if (!validateTrackingForm(form)) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

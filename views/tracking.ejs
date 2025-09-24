@@ -1,0 +1,180 @@
+<div class="max-w-6xl mx-auto">
+    <!-- Back Navigation -->
+    <div class="mb-6">
+        <a href="/" class="text-blue-600 hover:text-blue-800 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Search
+        </a>
+    </div>
+
+    <!-- Error Display -->
+    <% if (error) { %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Tracking Error</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <%= error %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <% if (trackingData) { %>
+        <!-- Tracking Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6" 
+             data-tracking-number="<%= trackingData.trackingNumber %>" 
+             data-carrier-code="<%= trackingData.carrierCode %>">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">
+                        Tracking: <%= trackingData.trackingNumber %>
+                    </h1>
+                    <div class="flex items-center space-x-4 text-sm text-gray-600">
+                        <span>
+                            <i class="fas fa-truck mr-1"></i>
+                            <%= trackingData.carrierName %>
+                        </span>
+                        <span data-last-updated>
+                            <i class="fas fa-clock mr-1"></i>
+                            Last updated: <%= new Date(trackingData.lastUpdated).toLocaleString() %>
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                        <% if (trackingData.currentStatus === 'DELIVERED') { %>
+                            bg-green-100 text-green-800
+                        <% } else if (trackingData.currentStatus === 'IN_TRANSIT' || trackingData.currentStatus === 'OUT_FOR_DELIVERY') { %>
+                            bg-blue-100 text-blue-800
+                        <% } else if (trackingData.currentStatus === 'EXCEPTION') { %>
+                            bg-red-100 text-red-800
+                        <% } else { %>
+                            bg-gray-100 text-gray-800
+                        <% } %>">
+                        <% 
+                        const statusIcons = {
+                            'PENDING': '⏳',
+                            'IN_TRANSIT': '🚛',
+                            'OUT_FOR_DELIVERY': '🚚',
+                            'DELIVERED': '✅',
+                            'EXCEPTION': '⚠️',
+                            'RETURNED': '↩️',
+                            'CANCELLED': '❌'
+                        };
+                        %>
+                        <%= statusIcons[trackingData.currentStatus] || '📦' %>
+                        <span class="ml-1" data-current-status><%= trackingData.currentStatus %></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracking Timeline -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">Tracking Timeline</h2>
+            
+            <% if (trackingData.events && trackingData.events.length > 0) { %>
+                <div class="tracking-timeline">
+                    <% trackingData.events.forEach((event, index) => { %>
+                        <div class="tracking-event">
+                            <div class="tracking-event-icon status-<%= event.status.toLowerCase().replace('_', '-') %>">
+                                <%= statusIcons[event.status] || '📦' %>
+                            </div>
+                            <div class="tracking-event-content">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
+                                    <h3 class="font-semibold text-gray-900">
+                                        <%= event.statusDescription || event.status %>
+                                    </h3>
+                                    <span class="text-sm text-gray-500">
+                                        <%= new Date(event.timestamp).toLocaleString() %>
+                                    </span>
+                                </div>
+                                
+                                <% if (event.location) { %>
+                                    <p class="text-gray-600 mb-1">
+                                        <i class="fas fa-map-marker-alt mr-1"></i>
+                                        <%= event.location %>
+                                    </p>
+                                <% } %>
+                                
+                                <% if (event.description) { %>
+                                    <p class="text-gray-700">
+                                        <%= event.description %>
+                                    </p>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-8">
+                    <i class="fas fa-info-circle text-gray-400 text-3xl mb-4"></i>
+                    <p class="text-gray-600">No tracking events available yet.</p>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Additional Information -->
+        <% if (trackingData.estimatedDelivery || trackingData.signedBy) { %>
+            <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <% if (trackingData.estimatedDelivery) { %>
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-1">Estimated Delivery</h3>
+                            <p class="text-gray-900"><%= trackingData.estimatedDelivery %></p>
+                        </div>
+                    <% } %>
+                    <% if (trackingData.signedBy) { %>
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-1">Signed By</h3>
+                            <p class="text-gray-900"><%= trackingData.signedBy %></p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- Real-time Updates Status -->
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mt-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-satellite-dish text-blue-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Real-time Updates</h3>
+                    <div class="mt-1 text-sm text-blue-700">
+                        This page automatically refreshes every 30 seconds to show the latest tracking information.
+                        <span class="connection-indicator connection-connected ml-2">
+                            <i class="fas fa-circle mr-1"></i>
+                            Connected
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Actions -->
+    <div class="mt-8 flex flex-wrap gap-4">
+        <a href="/" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+            <i class="fas fa-search mr-2"></i>
+            Track Another Shipment
+        </a>
+        <a href="/batch" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
+            <i class="fas fa-layer-group mr-2"></i>
+            Batch Tracking
+        </a>
+        <% if (trackingData) { %>
+            <button onclick="window.print()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                <i class="fas fa-print mr-2"></i>
+                Print
+            </button>
+        <% } %>
+    </div>
+</div>
