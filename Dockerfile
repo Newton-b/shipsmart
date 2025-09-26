@@ -1,4 +1,4 @@
-# Simple Railway Dockerfile - avoid permission issues
+# Railway Dockerfile - fix permission issues
 FROM node:18.17.0-alpine
 
 # Set working directory
@@ -22,18 +22,20 @@ COPY backend/package*.json ./backend/
 # Install frontend dependencies
 WORKDIR /app/frontend
 RUN npm install --legacy-peer-deps
+RUN chmod -R 755 node_modules/.bin
 
 # Install backend dependencies
 WORKDIR /app/backend  
 RUN npm install --legacy-peer-deps
 
-# Copy source code
+# Copy source code and fix all permissions
 WORKDIR /app
 COPY . .
+RUN chmod -R 755 /app
 
-# Build frontend (stay as root to avoid permission issues)
+# Build frontend using Node.js directly
 WORKDIR /app/frontend
-RUN npx vite build
+RUN node node_modules/vite/bin/vite.js build
 
 # Build backend
 WORKDIR /app/backend
