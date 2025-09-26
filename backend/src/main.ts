@@ -38,12 +38,25 @@ async function bootstrap() {
   // app.use(compression());
 
   // Serve static files from frontend build (for Railway deployment)
-  if (nodeEnv === 'production') {
-    const frontendPath = join(__dirname, '..', '..', 'frontend', 'dist');
-    app.useStaticAssets(frontendPath);
-    app.setBaseViewsDir(frontendPath);
-    logger.log(`📁 Serving static files from: ${frontendPath}`);
+  const frontendPath = join(__dirname, '..', '..', 'frontend', 'dist');
+  const indexPath = join(frontendPath, 'index.html');
+  
+  // Check if frontend files exist
+  const fs = require('fs');
+  if (fs.existsSync(frontendPath)) {
+    logger.log(`✅ Frontend dist directory found: ${frontendPath}`);
+    if (fs.existsSync(indexPath)) {
+      logger.log(`✅ index.html found: ${indexPath}`);
+    } else {
+      logger.error(`❌ index.html NOT found: ${indexPath}`);
+    }
+  } else {
+    logger.error(`❌ Frontend dist directory NOT found: ${frontendPath}`);
   }
+  
+  app.useStaticAssets(frontendPath);
+  app.setBaseViewsDir(frontendPath);
+  logger.log(`📁 Serving static files from: ${frontendPath}`);
 
   // CORS configuration
   app.enableCors({
@@ -76,21 +89,22 @@ async function bootstrap() {
   // WebSocket adapter - temporarily disabled for deployment
   // app.useWebSocketAdapter(new IoAdapter(app));
 
-  // Global prefix
+  // Global prefix for API routes
   app.setGlobalPrefix('api/v1');
 
   // Catch-all handler for SPA routing (serve index.html for non-API routes)
-  if (nodeEnv === 'production') {
-    const { Request, Response } = require('express');
-    app.use('*', (req: typeof Request, res: typeof Response) => {
-      // Don't serve index.html for API routes
-      if (req.originalUrl.startsWith('/api')) {
-        return res.status(404).json({ message: 'API endpoint not found' });
-      }
-      // Serve index.html for all other routes (SPA routing)
-      res.sendFile(join(__dirname, '..', '..', 'frontend', 'dist', 'index.html'));
-    });
-  }
+  // This must be AFTER the API routes are defined but handles all non-API requests
+  const { Request, Response } = require('express');
+  app.use('*', (req: typeof Request, res: typeof Response) => {
+    // Don't serve index.html for API routes
+    if (req.originalUrl.startsWith('/api')) {
+      return res.status(404).json({ message: 'API endpoint not found' });
+    }
+    // Serve index.html for all other routes (SPA routing)
+    const indexPath = join(__dirname, '..', '..', 'frontend', 'dist', 'index.html');
+    logger.log(`📄 Serving index.html from: ${indexPath} for route: ${req.originalUrl}`);
+    res.sendFile(indexPath);
+  });
 
   // Swagger documentation (only in development)
   if (nodeEnv === 'development') {
