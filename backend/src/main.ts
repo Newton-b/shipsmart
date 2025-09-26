@@ -2,15 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import compression from 'compression';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
@@ -35,6 +37,14 @@ async function bootstrap() {
   // Compression middleware
   app.use(compression());
 
+  // Serve static files from frontend build (for Railway deployment)
+  if (nodeEnv === 'production') {
+    const frontendPath = join(__dirname, '..', '..', 'frontend', 'dist');
+    app.useStaticAssets(frontendPath);
+    app.setBaseViewsDir(frontendPath);
+    logger.log(`📁 Serving static files from: ${frontendPath}`);
+  }
+
   // CORS configuration
   app.enableCors({
     origin: [
@@ -42,7 +52,10 @@ async function bootstrap() {
       'http://localhost:5173',
       'https://shipsmart.vercel.app',
       'https://shipsmart-frontend.vercel.app',
-    ],
+      // Add Railway domains
+      /\.railway\.app$/,
+      process.env.CORS_ORIGIN,
+    ].filter(Boolean),
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true,
@@ -65,6 +78,19 @@ async function bootstrap() {
 
   // Global prefix
   app.setGlobalPrefix('api/v1');
+
+  // Catch-all handler for SPA routing (serve index.html for non-API routes)
+  if (nodeEnv === 'production') {
+    const { Request, Response } = require('express');
+    app.use('*', (req: typeof Request, res: typeof Response) => {
+      // Don't serve index.html for API routes
+      if (req.originalUrl.startsWith('/api')) {
+        return res.status(404).json({ message: 'API endpoint not found' });
+      }
+      // Serve index.html for all other routes (SPA routing)
+      res.sendFile(join(__dirname, '..', '..', 'frontend', 'dist', 'index.html'));
+    });
+  }
 
   // Swagger documentation (only in development)
   if (nodeEnv === 'development') {

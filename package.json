@@ -28,6 +28,8 @@
     "@nestjs/mongoose": "^10.1.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.0.0",
+    "@nestjs/throttler": "^6.4.0",
+    "@nestjs/typeorm": "^11.0.0",
     "@types/leaflet": "^1.9.20",
     "@types/uuid": "^10.0.0",
     "axios": "^1.5.0",
