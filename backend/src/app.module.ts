@@ -16,6 +16,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { WebSocketModule } from './modules/websocket/websocket.module';
 import { CarriersModule } from './modules/carriers/carriers.module';
 import { EmailModule } from './modules/email/email.module';
+import { HealthController } from './health/health.controller';
 
 // Configuration
 import { databaseConfig } from './config/database.config';
@@ -104,7 +105,7 @@ import { redisConfig } from './config/redis.config';
     CarriersModule,
     EmailModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}
