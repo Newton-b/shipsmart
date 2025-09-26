@@ -45,7 +45,7 @@ export const FreightFooter: React.FC<FreightFooterProps> = ({ onContactClick, on
     {
       city: 'Accra',
       address: 'Airport City, Accra, Ghana',
-      phone: '+233 559204847',
+      phone: '0559204847',
       mapLink: 'https://maps.google.com/?q=Airport+City+Accra+Ghana'
     },
     {
@@ -210,11 +210,11 @@ export const FreightFooter: React.FC<FreightFooterProps> = ({ onContactClick, on
                 contact@shipsmart.com
               </button>
               <button 
-                onClick={() => window.open('tel:+1-800-SHIPSMART', '_self')}
+                onClick={() => window.open('tel:+971559204847', '_self')}
                 className="inline-flex items-center border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
               >
                 <Phone className="h-5 w-5 mr-2" />
-                1-800-SHIPSMART
+                0559204847
               </button>
             </div>
           </div>
