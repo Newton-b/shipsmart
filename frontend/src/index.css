@@ -2,6 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile-First Responsive Design */
+@layer base {
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  
+  body {
+    @apply text-sm sm:text-base;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Ensure proper viewport on mobile */
+  * {
+    box-sizing: border-box;
+  }
+}
+
+/* Mobile Navigation Improvements */
+@layer components {
+  .mobile-menu-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 z-40;
+  }
+  
+  .mobile-menu {
+    @apply fixed top-0 right-0 h-full w-80 max-w-full bg-white dark:bg-gray-900 shadow-xl z-50 transform transition-transform duration-300 ease-in-out;
+  }
+  
+  .mobile-menu.closed {
+    @apply translate-x-full;
+  }
+  
+  .mobile-menu.open {
+    @apply translate-x-0;
+  }
+}
+
+/* Responsive Typography */
+@layer utilities {
+  .text-responsive {
+    @apply text-sm sm:text-base md:text-lg;
+  }
+  
+  .heading-responsive {
+    @apply text-lg sm:text-xl md:text-2xl lg:text-3xl;
+  }
+  
+  .hero-heading {
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl;
+  }
+}
+
+/* Mobile-Optimized Spacing */
+@layer utilities {
+  .container-mobile {
+    @apply px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto;
+  }
+  
+  .section-padding {
+    @apply py-8 sm:py-12 md:py-16 lg:py-20;
+  }
+  
+  .card-padding {
+    @apply p-4 sm:p-6 md:p-8;
+  }
+}
+
+/* Touch-Friendly Interactive Elements */
+@layer components {
+  .btn-mobile {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+  
+  .input-mobile {
+    @apply min-h-[44px] text-base; /* Prevents zoom on iOS */
+  }
+  
+  .card-mobile {
+    @apply rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+}
+
+/* Mobile-Optimized Tables */
+@layer components {
+  .table-mobile {
+    @apply block sm:table w-full;
+  }
+  
+  .table-mobile thead {
+    @apply hidden sm:table-header-group;
+  }
+  
+  .table-mobile tbody {
+    @apply block sm:table-row-group;
+  }
+  
+  .table-mobile tr {
+    @apply block sm:table-row border-b sm:border-b-0 mb-4 sm:mb-0;
+  }
+  
+  .table-mobile td {
+    @apply block sm:table-cell text-right sm:text-left pl-0 sm:pl-4 py-2 sm:py-3;
+  }
+  
+  .table-mobile td:before {
+    content: attr(data-label) ": ";
+    @apply font-semibold text-left float-left sm:hidden;
+  }
+}
+
 /* Leaflet map z-index override to ensure modals appear above */
 .leaflet-container {
   z-index: 1 !important;
@@ -43,4 +155,32 @@
 
 .leaflet-popup-pane {
   z-index: 6 !important;
+}
+
+/* Mobile-Specific Fixes */
+@media (max-width: 640px) {
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Fix for iOS Safari viewport issues */
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Improve touch targets */
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+  
+  /* Better modal sizing on mobile */
+  .modal-content {
+    @apply max-h-[90vh] overflow-y-auto;
+  }
+  
+  /* Responsive images */
+  img {
+    @apply max-w-full h-auto;
+  }
 }
