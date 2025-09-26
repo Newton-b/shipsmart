@@ -4,10 +4,8 @@ const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const config_1 = require("@nestjs/config");
-const helmet_1 = require("helmet");
-const compression_1 = require("compression");
+const path_1 = require("path");
 const app_module_1 = require("./app.module");
-const platform_socket_io_1 = require("@nestjs/platform-socket.io");
 async function bootstrap() {
     const logger = new common_1.Logger('Bootstrap');
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
@@ -16,26 +14,21 @@ async function bootstrap() {
     const configService = app.get(config_1.ConfigService);
     const port = configService.get('PORT') || 3001;
     const nodeEnv = configService.get('NODE_ENV') || 'development';
-    app.use((0, helmet_1.default)({
-        contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                styleSrc: ["'self'", "'unsafe-inline'"],
-                scriptSrc: ["'self'"],
-                imgSrc: ["'self'", "data:", "https:"],
-                connectSrc: ["'self'", "wss:", "ws:"],
-            },
-        },
-        crossOriginEmbedderPolicy: false,
-    }));
-    app.use((0, compression_1.default)());
+    if (nodeEnv === 'production') {
+        const frontendPath = (0, path_1.join)(__dirname, '..', '..', 'frontend', 'dist');
+        app.useStaticAssets(frontendPath);
+        app.setBaseViewsDir(frontendPath);
+        logger.log(`📁 Serving static files from: ${frontendPath}`);
+    }
     app.enableCors({
         origin: [
             'http://localhost:3000',
             'http://localhost:5173',
             'https://shipsmart.vercel.app',
             'https://shipsmart-frontend.vercel.app',
-        ],
+            /\.railway\.app$/,
+            process.env.CORS_ORIGIN,
+        ].filter(Boolean),
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
         credentials: true,
@@ -48,8 +41,16 @@ async function bootstrap() {
             enableImplicitConversion: true,
         },
     }));
-    app.useWebSocketAdapter(new platform_socket_io_1.IoAdapter(app));
     app.setGlobalPrefix('api/v1');
+    if (nodeEnv === 'production') {
+        const { Request, Response } = require('express');
+        app.use('*', (req, res) => {
+            if (req.originalUrl.startsWith('/api')) {
+                return res.status(404).json({ message: 'API endpoint not found' });
+            }
+            res.sendFile((0, path_1.join)(__dirname, '..', '..', 'frontend', 'dist', 'index.html'));
+        });
+    }
     if (nodeEnv === 'development') {
         const config = new swagger_1.DocumentBuilder()
             .setTitle('ShipSmart API')

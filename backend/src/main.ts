@@ -3,11 +3,11 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import helmet from 'helmet';
-import compression from 'compression';
+// import * as helmet from 'helmet';
+// import * as compression from 'compression';
 import { join } from 'path';
 import { AppModule } from './app.module';
-import { IoAdapter } from '@nestjs/platform-socket.io';
+// import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -20,22 +20,22 @@ async function bootstrap() {
   const port = configService.get('PORT') || 3001;
   const nodeEnv = configService.get('NODE_ENV') || 'development';
 
-  // Security middleware
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "wss:", "ws:"],
-      },
-    },
-    crossOriginEmbedderPolicy: false,
-  }));
+  // Security middleware - temporarily disabled for deployment
+  // app.use(helmet({
+  //   contentSecurityPolicy: {
+  //     directives: {
+  //       defaultSrc: ["'self'"],
+  //       styleSrc: ["'self'", "'unsafe-inline'"],
+  //       scriptSrc: ["'self'"],
+  //       imgSrc: ["'self'", "data:", "https:"],
+  //       connectSrc: ["'self'", "wss:", "ws:"],
+  //     },
+  //   },
+  //   crossOriginEmbedderPolicy: false,
+  // }));
 
-  // Compression middleware
-  app.use(compression());
+  // Compression middleware - temporarily disabled for deployment
+  // app.use(compression());
 
   // Serve static files from frontend build (for Railway deployment)
   if (nodeEnv === 'production') {
@@ -73,8 +73,8 @@ async function bootstrap() {
     }),
   );
 
-  // WebSocket adapter
-  app.useWebSocketAdapter(new IoAdapter(app));
+  // WebSocket adapter - temporarily disabled for deployment
+  // app.useWebSocketAdapter(new IoAdapter(app));
 
   // Global prefix
   app.setGlobalPrefix('api/v1');

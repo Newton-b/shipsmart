@@ -6,16 +6,23 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthModule = void 0;
+exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-let AuthModule = class AuthModule {
+const config_1 = require("@nestjs/config");
+const health_controller_1 = require("./health/health.controller");
+let AppModule = class AppModule {
 };
-exports.AuthModule = AuthModule;
-exports.AuthModule = AuthModule = __decorate([
+exports.AppModule = AppModule;
+exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        controllers: [],
+        imports: [
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                envFilePath: ['.env.local', '.env'],
+            }),
+        ],
+        controllers: [health_controller_1.HealthController],
         providers: [],
-        exports: [],
     })
-], AuthModule);
-//# sourceMappingURL=auth.module.js.map
+], AppModule);
+//# sourceMappingURL=app.module.minimal.js.map
