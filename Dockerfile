@@ -1,51 +1,36 @@
-# Use Node.js 18 Alpine for smaller image size
-FROM node:18-alpine
+# Simple Dockerfile for Railway deployment
+FROM node:18.17.0-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Install global dependencies and update npm
-RUN npm install -g npm@latest @nestjs/cli
+# Install system dependencies for native modules
+RUN apk add --no-cache python3 make g++
 
-# Set npm configuration for legacy peer deps
-RUN npm config set legacy-peer-deps true
-RUN npm config set fund false
-RUN npm config set audit false
-
-# Copy package files first for better caching
+# Copy package files
+COPY package*.json ./
 COPY backend/package*.json ./backend/
 COPY frontend/package*.json ./frontend/
+
+# Copy .npmrc files for legacy peer deps
 COPY .npmrc ./
 COPY backend/.npmrc ./backend/
 COPY frontend/.npmrc ./frontend/
 
-# Install backend dependencies with legacy peer deps
-WORKDIR /app/backend
-RUN npm cache clean --force
-RUN npm install --legacy-peer-deps --no-audit --no-fund
+# Install NestJS CLI globally
+RUN npm install -g @nestjs/cli
 
-# Install frontend dependencies with legacy peer deps
-WORKDIR /app/frontend
-RUN npm cache clean --force
-RUN npm install --legacy-peer-deps --no-audit --no-fund
+# Install dependencies using the root package.json scripts
+RUN npm run install:all
 
 # Copy source code
-WORKDIR /app
 COPY . .
 
-# Build frontend
-WORKDIR /app/frontend
-RUN npm run build
-
-# Build backend
-WORKDIR /app/backend
+# Build the application using root scripts
 RUN npm run build
 
 # Expose port
 EXPOSE 3000
 
-# Set working directory to backend for startup
-WORKDIR /app/backend
-
 # Start the application
-CMD ["node", "dist/main.js"]
+CMD ["npm", "run", "start:prod"]

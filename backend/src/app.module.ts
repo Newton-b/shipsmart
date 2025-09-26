@@ -3,8 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-store';
+// import { CacheModule } from '@nestjs/cache-manager';
+// import { redisStore } from 'cache-manager-redis-store';
 
 // Core modules
 import { AuthModule } from './modules/auth/auth.module';
@@ -70,29 +70,29 @@ import { redisConfig } from './config/redis.config';
       inject: [ConfigService],
     }),
 
-    // Redis Cache
-    CacheModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
-        const redisUrl = configService.get('REDIS_URL');
-        
-        if (redisUrl) {
-          return {
-            store: redisStore,
-            url: redisUrl,
-            ttl: 300, // 5 minutes default TTL
-          };
-        }
-        
-        // Fallback to in-memory cache
-        return {
-          ttl: 300,
-          max: 1000,
-        };
-      },
-      inject: [ConfigService],
-    }),
+    // Redis Cache - Temporarily disabled for deployment
+    // CacheModule.registerAsync({
+    //   isGlobal: true,
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => {
+    //     const redisUrl = configService.get('REDIS_URL');
+    //     
+    //     if (redisUrl) {
+    //       return {
+    //         store: redisStore,
+    //         url: redisUrl,
+    //         ttl: 300, // 5 minutes default TTL
+    //       };
+    //     }
+    //     
+    //     // Fallback to in-memory cache
+    //     return {
+    //       ttl: 300,
+    //       max: 1000,
+    //     };
+    //   },
+    //   inject: [ConfigService],
+    // }),
 
     // Feature modules
     AuthModule,
