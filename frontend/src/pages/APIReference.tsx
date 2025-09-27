@@ -60,14 +60,14 @@ export const APIReference: React.FC<APIReferenceProps> = ({ onQuoteClick, onCont
       "transitDays": 25,
       "totalCost": 2450.00,
       "currency": "USD",
-      "carrier": "ShipSmart Ocean"
+      "carrier": "RaphTrack Ocean"
     },
     {
       "serviceType": "air_freight",
       "transitDays": 3,
       "totalCost": 4200.00,
       "currency": "USD",
-      "carrier": "ShipSmart Air"
+      "carrier": "RaphTrack Air"
     }
   ],
   "validUntil": "2024-01-25T23:59:59Z"
@@ -106,9 +106,9 @@ export const APIReference: React.FC<APIReferenceProps> = ({ onQuoteClick, onCont
       language: 'JavaScript',
       icon: '🟨',
       installation: 'npm install @shipsmartlogistics/api-client',
-      example: `import { ShipSmartAPI } from '@shipsmartlogistics/api-client';
+      example: `import { RaphTrackAPI } from '@shipsmartlogistics/api-client';
 
-const client = new ShipSmartAPI({
+const client = new RaphTrackAPI({
   apiKey: 'your-api-key',
   environment: 'production' // or 'sandbox'
 });
@@ -121,9 +121,9 @@ console.log(tracking.status);`
       language: 'Python',
       icon: '🐍',
       installation: 'pip install shipsmartlogistics',
-      example: `from shipsmartlogistics import ShipSmartAPI
+      example: `from shipsmartlogistics import RaphTrackAPI
 
-client = ShipSmartAPI(
+client = RaphTrackAPI(
     api_key='your-api-key',
     environment='production'
 )
@@ -139,7 +139,7 @@ print(tracking.status)`
       example: `<?php
 require_once 'vendor/autoload.php';
 
-use ShipSmartLogistics\\ApiClient;
+use RaphTrackLogistics\\ApiClient;
 
 $client = new ApiClient([
     'api_key' => 'your-api-key',
@@ -156,7 +156,7 @@ echo $tracking->status;`
     {
       step: 1,
       title: 'Get API Key',
-      description: 'Sign up for a ShipSmart developer account and generate your API key.'
+      description: 'Sign up for a RaphTrack developer account and generate your API key.'
     },
     {
       step: 2,
@@ -189,7 +189,7 @@ echo $tracking->status;`
               API Reference
             </h1>
             <p className="text-xl text-purple-100 max-w-3xl mx-auto mb-8">
-              Integrate ShipSmart's logistics capabilities into your applications 
+              Integrate RaphTrack's logistics capabilities into your applications 
               with our comprehensive REST API and SDKs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -218,7 +218,7 @@ echo $tracking->status;`
               Quick Start
             </h2>
             <p className="text-xl text-gray-600">
-              Get up and running with the ShipSmart API in minutes
+              Get up and running with the RaphTrack API in minutes
             </p>
           </div>
 

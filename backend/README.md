@@ -1,6 +1,6 @@
-# ShipSmart Backend
+# RaphTrack Backend
 
-A production-ready NestJS backend for the ShipSmart freight forwarding platform with real-time capabilities, comprehensive API integrations, and robust authentication.
+A production-ready NestJS backend for the RaphTrack freight forwarding platform with real-time capabilities, comprehensive API integrations, and robust authentication.
 
 ## 🚀 Features
 
@@ -52,10 +52,10 @@ DATABASE_HOST=localhost
 DATABASE_PORT=5432
 DATABASE_USERNAME=postgres
 DATABASE_PASSWORD=your_password
-DATABASE_NAME=shipsmart
+DATABASE_NAME=raphtrack
 
 # MongoDB Configuration
-MONGODB_URI=mongodb://localhost:27017/shipsmart
+MONGODB_URI=mongodb://localhost:27017/raphtrack
 
 # Redis Configuration
 REDIS_HOST=localhost
@@ -96,7 +96,7 @@ BACKEND_URL=http://localhost:3000
 #### PostgreSQL Setup
 ```bash
 # Create database
-createdb shipsmart
+createdb raphtrack
 
 # Run migrations
 npm run migration:run
@@ -368,10 +368,10 @@ docker-compose down
 ### Production Docker Build
 ```bash
 # Build the image
-docker build -t shipsmart-backend .
+docker build -t raphtrack-backend .
 
 # Run the container
-docker run -p 3000:3000 --env-file .env shipsmart-backend
+docker run -p 3000:3000 --env-file .env raphtrack-backend
 ```
 
 ## 🚀 Production Deployment
@@ -474,4 +474,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Ready to ship! 🚀** Your ShipSmart backend is now configured with production-ready features, real-time capabilities, and comprehensive API integrations.
+**Ready to ship! 🚀** Your RaphTrack backend is now configured with production-ready features, real-time capabilities, and comprehensive API integrations.

@@ -1,13 +1,12 @@
 {
   "name": "raphtrack-frontend",
   "version": "1.0.0",
-  "description": "React frontend for RaphTrack logistics platform",
+  "description": "RaphTrack Frontend Application for RaphTrack logistics platform",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "build:prod": "vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",

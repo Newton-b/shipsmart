@@ -1,7 +1,7 @@
 {
   "name": "raphtrack-backend",
   "version": "1.0.0",
-  "description": "RaphTrack Backend - Real-time logistics tracking platform",
+  "description": "RaphTrack Backend API - Real-time logistics tracking platform",
   "author": "RaphTrack Team",
   "private": true,
   "license": "MIT",

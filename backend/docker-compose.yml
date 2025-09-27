@@ -4,10 +4,10 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: shipsmart-postgres
+    container_name: raphtrack-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: shipsmart
+      POSTGRES_DB: raphtrack
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
@@ -16,28 +16,28 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init:/docker-entrypoint-initdb.d
     networks:
-      - shipsmart-network
+      - raphtrack-network
 
   # MongoDB Database
   mongodb:
     image: mongo:7-jammy
-    container_name: shipsmart-mongodb
+    container_name: raphtrack-mongodb
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: shipsmart
+      MONGO_INITDB_DATABASE: raphtrack
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
     networks:
-      - shipsmart-network
+      - raphtrack-network
 
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: shipsmart-redis
+    container_name: raphtrack-redis
     restart: unless-stopped
     command: redis-server --appendonly yes --requirepass password
     ports:
@@ -45,15 +45,15 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - shipsmart-network
+      - raphtrack-network
 
-  # ShipSmart Backend API
+  # RaphTrack Backend API
   backend:
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: shipsmart-backend
+    container_name: raphtrack-backend
     restart: unless-stopped
     depends_on:
       - postgres
@@ -66,8 +66,8 @@ services:
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: password
-      DB_NAME: shipsmart
-      MONGODB_URI: mongodb://admin:password@mongodb:27017/shipsmart?authSource=admin
+      DB_NAME: raphtrack
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/raphtrack?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: password
@@ -76,7 +76,7 @@ services:
     volumes:
       - ./uploads:/app/uploads
     networks:
-      - shipsmart-network
+      - raphtrack-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/health"]
       interval: 30s
@@ -87,7 +87,7 @@ services:
   # Nginx Reverse Proxy (Optional)
   nginx:
     image: nginx:alpine
-    container_name: shipsmart-nginx
+    container_name: raphtrack-nginx
     restart: unless-stopped
     depends_on:
       - backend
@@ -98,7 +98,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
     networks:
-      - shipsmart-network
+      - raphtrack-network
 
 volumes:
   postgres_data:
@@ -109,5 +109,5 @@ volumes:
     driver: local
 
 networks:
-  shipsmart-network:
+  raphtrack-network:
     driver: bridge
