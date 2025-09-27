@@ -43,6 +43,13 @@ export const FreightNavigation: React.FC<FreightNavigationProps> = ({ onNavigate
   ];
 
   const handleMenuClick = (path: string) => {
+    // Scroll to top for better mobile UX
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+    
     navigate(path);
     setIsMobileMenuOpen(false);
     setIsServicesOpen(false);

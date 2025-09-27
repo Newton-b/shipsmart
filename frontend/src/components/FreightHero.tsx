@@ -1,5 +1,6 @@
-import React from 'react';
-import { ArrowRight, Globe, Shield, Clock, Ship, Plane, Truck, Package, Container } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowRight, Globe, Shield, Clock, Ship, Plane, Truck, Package, Container, Play, TrendingUp } from 'lucide-react';
+import { InteractiveButton } from './InteractiveButton';
 
 interface FreightHeroProps {
   onQuoteClick: () => void;
@@ -7,11 +8,50 @@ interface FreightHeroProps {
 }
 
 export const FreightHero: React.FC<FreightHeroProps> = ({ onQuoteClick, onLearnMoreClick }) => {
-  const stats = [
-    { icon: Globe, value: '150+', label: 'Countries Served' },
-    { icon: Shield, value: '99.9%', label: 'On-Time Delivery' },
-    { icon: Clock, value: '24/7', label: 'Customer Support' },
-  ];
+  const [animatedStats, setAnimatedStats] = useState([
+    { icon: Globe, value: 0, target: 150, suffix: '+', label: 'Countries Served' },
+    { icon: Shield, value: 0, target: 99.9, suffix: '%', label: 'On-Time Delivery' },
+    { icon: Clock, value: 0, target: 24, suffix: '/7', label: 'Customer Support' },
+  ]);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+    
+    // Animate statistics
+    const animateStats = () => {
+      animatedStats.forEach((stat, index) => {
+        let current = 0;
+        const increment = stat.target / 50;
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= stat.target) {
+            current = stat.target;
+            clearInterval(timer);
+          }
+          setAnimatedStats(prev => prev.map((s, i) => 
+            i === index ? { ...s, value: current } : s
+          ));
+        }, 50);
+      });
+    };
+
+    const timer = setTimeout(animateStats, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleQuoteClick = async () => {
+    // Add some interactive feedback
+    await new Promise(resolve => setTimeout(resolve, 500));
+    onQuoteClick();
+  };
+
+  const handleLearnMoreClick = async () => {
+    if (onLearnMoreClick) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      onLearnMoreClick();
+    }
+  };
 
   return (
     <div className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 overflow-hidden">
@@ -82,31 +122,45 @@ export const FreightHero: React.FC<FreightHeroProps> = ({ onQuoteClick, onLearnM
               and Real-time Tracking with unparalleled visibility and control.
             </p>
 
-            {/* Stats */}
+            {/* Animated Stats */}
             <div className="grid grid-cols-3 gap-6 mb-8">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <stat.icon className="h-8 w-8 text-blue-300 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-white">{stat.value}</div>
-                  <div className="text-sm text-blue-200">{stat.label}</div>
+              {animatedStats.map((stat, index) => (
+                <div key={index} className={`text-center transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`} style={{ transitionDelay: `${index * 200}ms` }}>
+                  <div className="bg-blue-800/50 rounded-lg p-4 hover:bg-blue-700/50 transition-colors cursor-pointer group">
+                    <stat.icon className="h-8 w-8 text-blue-300 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                    <div className="text-2xl font-bold text-white">
+                      {stat.target === 99.9 ? stat.value.toFixed(1) : Math.floor(stat.value)}{stat.suffix}
+                    </div>
+                    <div className="text-sm text-blue-200">{stat.label}</div>
+                  </div>
                 </div>
               ))}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <button 
-                onClick={onQuoteClick}
-                className="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center"
+              <InteractiveButton
+                onClick={handleQuoteClick}
+                variant="secondary"
+                size="lg"
+                icon={ArrowRight}
+                className="bg-white text-blue-900 hover:bg-blue-50"
+                loadingText="Getting Quote..."
+                successText="Quote Ready!"
               >
                 Get Instant Quote
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
-              <button 
-                onClick={onLearnMoreClick || (() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' }))}
-                className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-900 transition-colors"
+              </InteractiveButton>
+              
+              <InteractiveButton
+                onClick={handleLearnMoreClick}
+                variant="outline"
+                size="lg"
+                icon={Play}
+                className="border-2 border-white text-white hover:bg-white hover:text-blue-900"
+                loadingText="Loading..."
+                successText="Let's Go!"
               >
                 Learn More
-              </button>
+              </InteractiveButton>
             </div>
           </div>
 

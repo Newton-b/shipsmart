@@ -57,6 +57,10 @@ import { WeatherAlerts } from './components/WeatherAlerts';
 import { RealTimeInventory } from './components/RealTimeInventory';
 import { LiveVideoFeeds } from './components/LiveVideoFeeds';
 import { PredictiveAnalytics } from './components/PredictiveAnalytics';
+import ScrollToTop from './components/ScrollToTop';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import CookiePolicy from './pages/CookiePolicy';
 
 function App() {
   return (
@@ -102,6 +106,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900 relative">
+      <ScrollToTop />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={
@@ -547,6 +552,29 @@ const AppContent: React.FC = () => {
               <FreightFooter onContactClick={handleContactClick} onNavigate={handleNavigate} onPageNavigate={(page) => navigate(`/${page}`)} />
             </>
           </AuthenticatedRoute>
+        } />
+
+        {/* Legal Pages */}
+        <Route path="/privacy-policy" element={
+          <>
+            <FreightNavigation onNavigate={handleNavigate} />
+            <PrivacyPolicy />
+            <FreightFooter onContactClick={handleContactClick} onNavigate={handleNavigate} onPageNavigate={(page) => navigate(`/${page}`)} />
+          </>
+        } />
+        <Route path="/terms-of-service" element={
+          <>
+            <FreightNavigation onNavigate={handleNavigate} />
+            <TermsOfService />
+            <FreightFooter onContactClick={handleContactClick} onNavigate={handleNavigate} onPageNavigate={(page) => navigate(`/${page}`)} />
+          </>
+        } />
+        <Route path="/cookie-policy" element={
+          <>
+            <FreightNavigation onNavigate={handleNavigate} />
+            <CookiePolicy />
+            <FreightFooter onContactClick={handleContactClick} onNavigate={handleNavigate} onPageNavigate={(page) => navigate(`/${page}`)} />
+          </>
         } />
 
         {/* Contact Page */}
