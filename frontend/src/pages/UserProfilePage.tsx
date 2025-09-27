@@ -8,6 +8,8 @@ export const UserProfilePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
@@ -74,6 +76,68 @@ export const UserProfilePage: React.FC = () => {
     }
   };
 
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+
+    try {
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAvatarPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Create FormData for upload
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      // Upload to backend (you'll need to implement this endpoint)
+      const response = await fetch('/api/v1/users/avatar', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update user context with new avatar URL
+        await updateProfile({ avatar: data.avatarUrl });
+        setAvatarPreview(null);
+        alert('Profile picture updated successfully!');
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Avatar upload failed:', error);
+      alert('Failed to upload profile picture. Please try again.');
+      setAvatarPreview(null);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const triggerFileInput = () => {
+    const fileInput = document.getElementById('avatar-upload') as HTMLInputElement;
+    fileInput?.click();
+  };
+
   const getInitials = () => {
     return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
   };
@@ -100,7 +164,13 @@ export const UserProfilePage: React.FC = () => {
           <div className="px-6 py-8">
             <div className="flex items-center space-x-6">
               <div className="relative">
-                {user.avatar ? (
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="Avatar Preview"
+                    className="w-24 h-24 rounded-full object-cover border-2 border-blue-500"
+                  />
+                ) : user.avatar ? (
                   <img
                     src={user.avatar}
                     alt={`${user.firstName} ${user.lastName}`}
@@ -111,9 +181,25 @@ export const UserProfilePage: React.FC = () => {
                     {getInitials()}
                   </div>
                 )}
-                <button className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
-                  <Camera className="h-4 w-4" />
+                <button 
+                  onClick={triggerFileInput}
+                  disabled={isUploadingAvatar}
+                  className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Upload profile picture"
+                >
+                  {isUploadingAvatar ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  ) : (
+                    <Camera className="h-4 w-4" />
+                  )}
                 </button>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">

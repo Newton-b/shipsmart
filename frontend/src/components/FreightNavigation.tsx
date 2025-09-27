@@ -56,17 +56,19 @@ export const FreightNavigation: React.FC<FreightNavigationProps> = ({ onNavigate
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50 transition-colors duration-200">
+    <nav className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg sticky top-0 z-50 transition-all duration-300 border-b border-gray-100 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 sm:h-18">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center flex-shrink-0">
             <button
               onClick={() => handleMenuClick('/')}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 group"
             >
-              <Anchor className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-              <span className="text-xl font-bold text-gray-900 dark:text-white">ShipSmart</span>
+              <div className="p-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
+                <Anchor className="h-7 w-7 sm:h-8 sm:w-8 text-blue-600 dark:text-blue-400" />
+              </div>
+              <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight">RaphTrack</span>
             </button>
           </div>
 
@@ -201,23 +203,31 @@ export const FreightNavigation: React.FC<FreightNavigationProps> = ({ onNavigate
           </div>
 
           {/* Right side - Notifications, Theme Toggle and Auth */}
-          <div className="flex items-center space-x-4">
-            {isAuthenticated && <NotificationBell />}
-            <ThemeToggle />
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {isAuthenticated && (
+              <div className="hidden sm:block">
+                <NotificationBell />
+              </div>
+            )}
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
             
             {isAuthenticated ? (
-              <UserProfile onNavigate={onNavigate} />
+              <div className="hidden sm:block">
+                <UserProfile onNavigate={onNavigate} />
+              </div>
             ) : (
               <div className="hidden md:flex items-center space-x-3">
                 <button
                   onClick={() => handleMenuClick('/login')}
-                  className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+                  className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   Login
                 </button>
                 <button
                   onClick={() => handleMenuClick('/register')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
                 >
                   Sign Up
                 </button>
@@ -228,123 +238,145 @@ export const FreightNavigation: React.FC<FreightNavigationProps> = ({ onNavigate
             <div className="md:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2"
+                className="relative p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                aria-label="Toggle mobile menu"
               >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                <div className="relative w-6 h-6">
+                  <span className={`absolute inset-0 transform transition-all duration-300 ${isMobileMenuOpen ? 'rotate-180 opacity-0' : 'rotate-0 opacity-100'}`}>
+                    <Menu className="h-6 w-6" />
+                  </span>
+                  <span className={`absolute inset-0 transform transition-all duration-300 ${isMobileMenuOpen ? 'rotate-0 opacity-100' : '-rotate-180 opacity-0'}`}>
+                    <X className="h-6 w-6" />
+                  </span>
+                </div>
               </button>
             </div>
           </div>
         </div>
 
         {/* Mobile Navigation Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <button
-                onClick={() => handleMenuClick('/')}
-                className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-              >
-                Home
-              </button>
-
-              {/* Mobile Services */}
-              <div className="space-y-1">
-                <div className="px-3 py-2 text-base font-medium text-gray-900 dark:text-white">Services</div>
-                {services.map((service) => (
-                  <button
-                    key={service.path}
-                    onClick={() => handleMenuClick(service.path)}
-                    className="block w-full text-left px-6 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                  >
-                    {service.name}
-                  </button>
-                ))}
-              </div>
-
-              {/* Mobile Resources */}
-              <div className="space-y-1">
-                <div className="px-3 py-2 text-base font-medium text-gray-900 dark:text-white">Resources</div>
-                {resources.map((resource) => (
-                  <button
-                    key={resource.path}
-                    onClick={() => handleMenuClick(resource.path)}
-                    className="block w-full text-left px-6 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                  >
-                    {resource.name}
-                  </button>
-                ))}
-              </div>
-
-              {/* Mobile Company */}
-              <div className="space-y-1">
-                <div className="px-3 py-2 text-base font-medium text-gray-900 dark:text-white">Company</div>
-                {company.map((item) => (
-                  <button
-                    key={item.path}
-                    onClick={() => handleMenuClick(item.path)}
-                    className="block w-full text-left px-6 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                  >
-                    {item.name}
-                  </button>
-                ))}
-              </div>
-
-              {/* Mobile Role-based navigation items */}
-              {isAuthenticated && isShipper && (
-                <button
-                  onClick={() => handleMenuClick('/tracking')}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                >
-                  Track Shipments
-                </button>
-              )}
-
-              {isAuthenticated && isSystemAdmin && (
-                <button
-                  onClick={() => handleMenuClick('/admin')}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                >
-                  Admin Dashboard
-                </button>
-              )}
-
-              {/* Show Track for non-authenticated users */}
-              {!isAuthenticated && (
-                <button
-                  onClick={() => handleMenuClick('/track')}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                >
-                  Track
-                </button>
-              )}
-
-              <button
-                onClick={() => handleMenuClick('/contact')}
-                className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-              >
-                Contact
-              </button>
-
-              {/* Mobile Auth */}
-              {!isAuthenticated && (
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-2">
-                  <button
-                    onClick={() => handleMenuClick('/login')}
-                    className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => handleMenuClick('/register')}
-                    className="block w-full text-left px-3 py-2 text-base font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
-                  >
-                    Sign Up
-                  </button>
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 shadow-lg">
+            <div className="px-4 py-6 space-y-4">
+              {/* Mobile User Profile Section */}
+              {isAuthenticated && (
+                <div className="pb-4 border-b border-gray-200 dark:border-gray-700">
+                  <UserProfile onNavigate={onNavigate} />
                 </div>
               )}
+
+              {/* Mobile Quick Actions */}
+              <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
+                {isAuthenticated && <NotificationBell />}
+                <ThemeToggle />
+                {!isAuthenticated && (
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => handleMenuClick('/login')}
+                      className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                    >
+                      Login
+                    </button>
+                    <button
+                      onClick={() => handleMenuClick('/register')}
+                      className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-md hover:shadow-lg transition-all"
+                    >
+                      Sign Up
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Navigation Links */}
+              <div className="space-y-2">
+                <button
+                  onClick={() => handleMenuClick('/')}
+                  className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200"
+                >
+                  Home
+                </button>
+
+                {/* Mobile Services Section */}
+                <div className="space-y-2">
+                  <div className="px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Services</div>
+                  {services.map((service) => (
+                    <button
+                      key={service.path}
+                      onClick={() => handleMenuClick(service.path)}
+                      className="flex items-center w-full px-6 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200"
+                    >
+                      {service.name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Mobile Resources Section */}
+                <div className="space-y-2">
+                  <div className="px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Resources</div>
+                  {resources.map((resource) => (
+                    <button
+                      key={resource.path}
+                      onClick={() => handleMenuClick(resource.path)}
+                      className="flex items-center w-full px-6 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200"
+                    >
+                      {resource.name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Mobile Company Section */}
+                <div className="space-y-2">
+                  <div className="px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Company</div>
+                  {company.map((item) => (
+                    <button
+                      key={item.path}
+                      onClick={() => handleMenuClick(item.path)}
+                      className="flex items-center w-full px-6 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200"
+                    >
+                      {item.name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Mobile Role-based navigation items */}
+                {isAuthenticated && isShipper && (
+                  <button
+                    onClick={() => handleMenuClick('/tracking')}
+                    className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200"
+                  >
+                    Track Shipments
+                  </button>
+                )}
+
+                {isAuthenticated && isSystemAdmin && (
+                  <button
+                    onClick={() => handleMenuClick('/admin')}
+                    className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200"
+                  >
+                    Admin Dashboard
+                  </button>
+                )}
+
+                {/* Show Track for non-authenticated users */}
+                {!isAuthenticated && (
+                  <button
+                    onClick={() => handleMenuClick('/track')}
+                    className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200"
+                  >
+                    Track
+                  </button>
+                )}
+
+                <button
+                  onClick={() => handleMenuClick('/contact')}
+                  className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200"
+                >
+                  Contact
+                </button>
+              </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

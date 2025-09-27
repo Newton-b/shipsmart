@@ -173,7 +173,7 @@ export const Register: React.FC<RegisterProps> = ({ onQuoteClick, onContactClick
           Create your account
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Join ShipSmart and start managing your shipments
+          Join RaphTrack and start managing your shipments
         </p>
       </div>
 

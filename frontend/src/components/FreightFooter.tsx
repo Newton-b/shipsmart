@@ -45,7 +45,7 @@ export const FreightFooter: React.FC<FreightFooterProps> = ({ onContactClick, on
     {
       city: 'Accra',
       address: 'Airport City, Accra, Ghana',
-      phone: '0559204847',
+      phone: '+233559204847',
       mapLink: 'https://maps.google.com/?q=Airport+City+Accra+Ghana'
     },
     {
@@ -203,18 +203,18 @@ export const FreightFooter: React.FC<FreightFooterProps> = ({ onContactClick, on
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
-                onClick={() => window.open('mailto:contact@shipsmart.com', '_self')}
+                onClick={() => window.open('mailto:contact@raphtrack.com', '_self')}
                 className="inline-flex items-center bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 <Mail className="h-5 w-5 mr-2" />
-                contact@shipsmart.com
+                contact@raphtrack.com
               </button>
               <button 
-                onClick={() => window.open('tel:+971559204847', '_self')}
+                onClick={() => window.open('tel:+233559204847', '_self')}
                 className="inline-flex items-center border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
               >
                 <Phone className="h-5 w-5 mr-2" />
-                0559204847
+                +233559204847
               </button>
             </div>
           </div>
@@ -223,7 +223,7 @@ export const FreightFooter: React.FC<FreightFooterProps> = ({ onContactClick, on
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-400 text-sm">
-            &copy; 2024 ShipSmart. All rights reserved.
+            &copy; 2024 RaphTrack. All rights reserved.
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <button 

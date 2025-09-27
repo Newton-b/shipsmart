@@ -1,8 +1,8 @@
 {
-  "name": "shipsmart-backend",
+  "name": "raphtrack-backend",
   "version": "1.0.0",
-  "description": "ShipSmart Production Backend - Real-time freight forwarding platform",
-  "author": "ShipSmart Team",
+  "description": "RaphTrack Backend - Real-time logistics tracking platform",
+  "author": "RaphTrack Team",
   "private": true,
   "license": "MIT",
   "scripts": {

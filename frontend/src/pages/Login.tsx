@@ -275,7 +275,7 @@ export const Login: React.FC<LoginProps> = ({ onQuoteClick, onContactClick, onNa
               Welcome Back
             </h2>
             <p className="text-gray-600">
-              Sign in to your ShipSmart account to manage your shipments
+              Sign in to your RaphTrack account to manage your shipments
             </p>
           </div>
 
@@ -497,7 +497,7 @@ export const Login: React.FC<LoginProps> = ({ onQuoteClick, onContactClick, onNa
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
               <h4 className="text-sm font-semibold text-green-800 mb-2">Ready to Start Shipping?</h4>
               <p className="text-xs text-green-700 mb-3">
-                Join thousands of businesses who trust ShipSmart for their logistics needs. 
+                Join thousands of businesses who trust RaphTrack for their logistics needs. 
                 Create your account to access real-time tracking, competitive rates, and dedicated support.
               </p>
               <div className="space-y-2">
@@ -538,7 +538,7 @@ export const Login: React.FC<LoginProps> = ({ onQuoteClick, onContactClick, onNa
             Streamline Your Logistics
           </h3>
           <p className="text-blue-100 mb-8 text-lg">
-            Join thousands of businesses who trust ShipSmart for their global shipping needs.
+            Join thousands of businesses who trust RaphTrack for their global shipping needs.
           </p>
           <div className="space-y-4">
             {features.map((feature, index) => (

@@ -46,7 +46,7 @@ export const Contact: React.FC = () => {
     {
       city: 'Accra',
       address: 'Tema Harbour, Accra, Ghana',
-      phone: '0559204847',
+      phone: '+233559204847',
       email: 'nytema@shipmart.com'
     },
     {

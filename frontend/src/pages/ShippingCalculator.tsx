@@ -257,7 +257,7 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({ onQuoteC
         results.push({
           id: 1,
           service: 'Ocean Freight (FCL/LCL)',
-          carrier: 'ShipSmart Ocean Lines',
+          carrier: 'RaphTrack Ocean Lines',
           transitDays: oceanTransit,
           cost: oceanCost,
           currency: 'USD',
@@ -290,7 +290,7 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({ onQuoteC
         results.push({
           id: 2,
           service: 'Air Freight Express',
-          carrier: 'ShipSmart Air Cargo',
+          carrier: 'RaphTrack Air Cargo',
           transitDays: airTransit,
           cost: airCost,
           currency: 'USD',
@@ -323,7 +323,7 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({ onQuoteC
         results.push({
           id: 3,
           service: 'Ground Transportation',
-          carrier: 'ShipSmart Logistics',
+          carrier: 'RaphTrack Logistics',
           transitDays: groundTransit,
           cost: groundCost,
           currency: 'USD',

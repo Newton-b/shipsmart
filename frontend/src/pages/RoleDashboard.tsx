@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Truck, 
@@ -7,216 +7,117 @@ import {
   DollarSign,
   Package,
   Ship,
-  ArrowRight,
   Activity,
   BarChart3,
-  MapPin
+  MapPin,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-
-interface RoleCard {
-  id: string;
-  name: string;
-  description: string;
-  features: string[];
-  icon: React.ComponentType<{ className?: string }>;
-  path: string;
-  color: string;
-  bgGradient: string;
-}
 
 const RoleDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const roles: RoleCard[] = [
-    {
-      id: 'shipper',
-      name: 'Shipper Dashboard',
-      description: 'Manage your shipments, track deliveries, and monitor logistics operations',
-      features: ['Live Tracking Map', 'Shipment Management', 'Analytics Dashboard', 'Real-time Notifications'],
-      icon: Package,
-      path: '/shipper',
-      color: 'text-blue-600',
-      bgGradient: 'from-blue-500 to-blue-600'
-    },
-    {
-      id: 'carrier',
-      name: 'Carrier Dashboard',
-      description: 'Fleet management, operations oversight, and business analytics',
-      features: ['Fleet Overview', 'Operations Management', 'Performance Analytics', 'Route Optimization'],
-      icon: Ship,
-      path: '/carrier',
-      color: 'text-green-600',
-      bgGradient: 'from-green-500 to-green-600'
-    },
-    {
-      id: 'driver',
-      name: 'Driver Dashboard',
-      description: 'Delivery routes, customer locations, and real-time navigation',
-      features: ['Live Delivery Map', 'Customer Locations', 'Route Optimization', 'Performance Tracking'],
-      icon: Truck,
-      path: '/driver',
-      color: 'text-orange-600',
-      bgGradient: 'from-orange-500 to-orange-600'
-    },
-    {
-      id: 'dispatcher',
-      name: 'Dispatcher Dashboard',
-      description: 'Fleet coordination, route optimization, and driver management',
-      features: ['Fleet Management', 'Route Planning', 'Driver Analytics', 'Real-time Tracking'],
-      icon: Users,
-      path: '/dispatcher',
-      color: 'text-purple-600',
-      bgGradient: 'from-purple-500 to-purple-600'
-    },
-    {
-      id: 'customer-service',
-      name: 'Customer Service',
-      description: 'Support ticket management, live chat, and customer analytics',
-      features: ['Ticket Management', 'Live Chat Support', 'Customer Analytics', 'Knowledge Base'],
-      icon: MessageSquare,
-      path: '/customer-service',
-      color: 'text-pink-600',
-      bgGradient: 'from-pink-500 to-pink-600'
-    },
-    {
-      id: 'finance',
-      name: 'Finance Dashboard',
-      description: 'Financial analytics, invoicing, and comprehensive reporting',
-      features: ['Financial Analytics', 'Invoice Management', 'Revenue Tracking', 'Expense Reports'],
-      icon: DollarSign,
-      path: '/finance',
-      color: 'text-indigo-600',
-      bgGradient: 'from-indigo-500 to-indigo-600'
-    }
-  ];
-
-  const handleRoleSelect = (role: RoleCard) => {
-    navigate(role.path);
+  // Role to path mapping
+  const rolePathMap: Record<string, string> = {
+    'shipper': '/shipper',
+    'carrier': '/carrier',
+    'driver': '/driver',
+    'dispatcher': '/dispatcher',
+    'customer-service': '/customer-service',
+    'finance': '/finance',
+    'system-admin': '/admin'
   };
 
+  // Auto-redirect based on user role
+  useEffect(() => {
+    if (user?.role) {
+      const targetPath = rolePathMap[user.role];
+      if (targetPath) {
+        // Small delay to show loading state
+        setTimeout(() => {
+          navigate(targetPath, { replace: true });
+        }, 1500);
+      }
+    }
+  }, [user, navigate]);
+
+  // Get role display information
+  const getRoleInfo = (role: string) => {
+    const roleInfo: Record<string, { name: string; icon: React.ComponentType<{ className?: string }>; color: string }> = {
+      'shipper': { name: 'Shipper (Customer)', icon: Package, color: 'text-blue-600' },
+      'system-admin': { name: 'System Administrator', icon: Users, color: 'text-purple-600' },
+      'carrier': { name: 'Carrier (Freight Company)', icon: Ship, color: 'text-green-600' },
+      'driver': { name: 'Driver', icon: Truck, color: 'text-orange-600' },
+      'dispatcher': { name: 'Dispatcher', icon: MapPin, color: 'text-purple-600' },
+      'customer-service': { name: 'Customer Service', icon: MessageSquare, color: 'text-pink-600' },
+      'finance': { name: 'Finance', icon: DollarSign, color: 'text-indigo-600' }
+    };
+    return roleInfo[role] || { name: 'User', icon: Users, color: 'text-gray-600' };
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Access Denied</h2>
+          <p className="text-gray-600 dark:text-gray-400">Please log in to access your dashboard.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const roleInfo = getRoleInfo(user.role);
+  const IconComponent = roleInfo.icon;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Welcome to ShipSmart
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-2">
-            Hello, {user?.firstName}! Choose your role to access specialized features
-          </p>
-          <p className="text-gray-500 dark:text-gray-500">
-            Each dashboard is tailored with live analytics, real-time maps, and interactive features
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900 flex items-center justify-center">
+      <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center border border-gray-200 dark:border-gray-700">
+          {/* Loading Animation */}
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <IconComponent className={`w-8 h-8 ${roleInfo.color}`} />
+            </div>
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
+              <span className="text-gray-600 dark:text-gray-400">Loading your dashboard...</span>
+            </div>
+          </div>
 
-        {/* Role Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {roles.map((role) => {
-            const IconComponent = role.icon;
-            return (
-              <div
-                key={role.id}
-                onClick={() => handleRoleSelect(role)}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 border border-gray-200 dark:border-gray-700"
-              >
-                {/* Card Header with Gradient */}
-                <div className={`bg-gradient-to-r ${role.bgGradient} p-6 rounded-t-xl`}>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-white">{role.name}</h3>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Activity className="w-4 h-4 text-white/80" />
-                        <span className="text-white/80 text-sm">Live & Interactive</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          {/* User Info */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Welcome to RaphTrack, {user.firstName}!
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
+              Redirecting you to your {roleInfo.name} dashboard
+            </p>
+            <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
+              {roleInfo.name}
+            </div>
+          </div>
 
-                {/* Card Content */}
-                <div className="p-6">
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    {role.description}
-                  </p>
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
+            <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+          </div>
 
-                  {/* Features List */}
-                  <div className="space-y-2 mb-6">
-                    {role.features.map((feature, index) => (
-                      <div key={index} className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                        <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Action Button */}
-                  <button className="w-full flex items-center justify-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white py-3 px-4 rounded-lg transition-colors">
-                    <span className="font-medium">Access Dashboard</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Live Indicators */}
-                <div className="px-6 pb-4">
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center space-x-1">
-                      <MapPin className="w-3 h-3" />
-                      <span>Real-time Maps</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <BarChart3 className="w-3 h-3" />
-                      <span>Live Analytics</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Activity className="w-3 h-3 text-green-500" />
-                      <span>Active</span>
-                    </div>
-                  </div>
-                </div>
+          {/* Features Preview */}
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            <p>Your dashboard includes:</p>
+            <div className="flex items-center justify-center space-x-4 mt-2">
+              <div className="flex items-center space-x-1">
+                <Activity className="w-3 h-3 text-green-500" />
+                <span>Live Data</span>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="text-center mt-12">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              All Dashboards Feature
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <MapPin className="w-6 h-6 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Live Maps</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Real-time vehicle tracking</p>
+              <div className="flex items-center space-x-1">
+                <BarChart3 className="w-3 h-3 text-blue-500" />
+                <span>Analytics</span>
               </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <BarChart3 className="w-6 h-6 text-green-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Analytics</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Live data visualization</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Activity className="w-6 h-6 text-purple-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Real-time Updates</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Live notifications & alerts</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Users className="w-6 h-6 text-orange-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Collaboration</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Team communication tools</p>
+              <div className="flex items-center space-x-1">
+                <MapPin className="w-3 h-3 text-purple-500" />
+                <span>Real-time Maps</span>
               </div>
             </div>
           </div>

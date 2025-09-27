@@ -1,8 +1,8 @@
 {
-  "name": "shipsmart-tracking-microservice",
+  "name": "raphtrack-monorepo",
   "version": "1.0.0",
-  "description": "Comprehensive shipment tracking microservice for ShipSmart logistics platform",
-  "author": "ShipSmart Team",
+  "description": "Comprehensive logistics tracking platform for RaphTrack",
+  "author": "RaphTrack Team",
   "private": true,
   "license": "MIT",
   "scripts": {

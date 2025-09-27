@@ -113,14 +113,14 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                     <Mail className="h-5 w-5 text-blue-600 mr-3" />
                     <div>
                       <div className="text-sm font-medium text-gray-900">Email</div>
-                      <div className="text-sm text-gray-600">contact@shipsmart.com</div>
+                      <div className="text-sm text-gray-600">contact@raphtrack.com</div>
                     </div>
                   </div>
                   <div className="flex items-center">
                     <Phone className="h-5 w-5 text-blue-600 mr-3" />
                     <div>
                       <div className="text-sm font-medium text-gray-900">Phone</div>
-                      <div className="text-sm text-gray-600">0559204847</div>
+                      <div className="text-sm text-gray-600">+233559204847</div>
                     </div>
                   </div>
                   <div className="flex items-center">

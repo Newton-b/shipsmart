@@ -8,7 +8,7 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   
   try {
-    logger.log('🚀 Starting ShipSmart Backend...');
+    logger.log('🚀 Starting RaphTrack Backend...');
     
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: ['error', 'warn', 'log'],
@@ -30,40 +30,52 @@ async function bootstrap() {
     app.setGlobalPrefix('api/v1');
     logger.log('✅ Global prefix set: api/v1');
 
-    // Try to serve static files (optional)
+    // Serve static files (frontend and uploads)
     try {
       const frontendPath = join(__dirname, '..', '..', 'frontend', 'dist');
+      const uploadsPath = join(process.cwd(), 'uploads');
       const fs = require('fs');
+      
+      // Serve frontend files
       if (fs.existsSync(frontendPath)) {
         app.useStaticAssets(frontendPath);
-        logger.log('✅ Static files configured');
-        
-        // Simple catch-all for SPA
-        app.use('*', (req, res) => {
-          if (req.originalUrl.startsWith('/api')) {
-            return res.status(404).json({ message: 'API endpoint not found' });
-          }
-          const indexPath = join(frontendPath, 'index.html');
-          if (fs.existsSync(indexPath)) {
-            res.sendFile(indexPath);
-          } else {
-            res.status(404).json({ message: 'Frontend not available' });
-          }
-        });
-        logger.log('✅ SPA routing configured');
+        logger.log('✅ Frontend static files configured');
       } else {
         logger.warn('⚠️ Frontend files not found - API only mode');
       }
+
+      // Serve uploaded files (avatars, etc.)
+      if (!fs.existsSync(uploadsPath)) {
+        fs.mkdirSync(uploadsPath, { recursive: true });
+      }
+      app.useStaticAssets(uploadsPath, { prefix: '/uploads/' });
+      logger.log('✅ Uploads directory configured');
+      
+      // Simple catch-all for SPA routing
+      app.use('*', (req, res) => {
+        if (req.originalUrl.startsWith('/api')) {
+          return res.status(404).json({ message: 'API endpoint not found' });
+        }
+        const indexPath = join(frontendPath, 'index.html');
+        if (fs.existsSync(indexPath)) {
+          res.sendFile(indexPath);
+        } else {
+          res.status(404).json({ message: 'Frontend not available' });
+        }
+      });
+      logger.log('✅ SPA routing configured');
+      
     } catch (error) {
-      logger.warn(`⚠️ Frontend setup failed: ${error.message} - API only mode`);
+      logger.warn(`⚠️ Error configuring static files: ${error.message}`);
     }
 
     // Start server
     await app.listen(port, '0.0.0.0');
     
-    logger.log(`🎉 ShipSmart Backend running successfully!`);
+    logger.log(`🎉 RaphTrack Backend running successfully!`);
     logger.log(`🌐 Server: http://0.0.0.0:${port}`);
     logger.log(`🏥 Health: http://0.0.0.0:${port}/api/v1/health`);
+    logger.log(`📁 Uploads: http://0.0.0.0:${port}/uploads/`);
     logger.log(`📚 Environment: ${process.env.NODE_ENV || 'production'}`);
     
   } catch (error) {

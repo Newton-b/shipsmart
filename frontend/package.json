@@ -1,7 +1,7 @@
 {
-  "name": "shipsmart-tracking-frontend",
+  "name": "raphtrack-frontend",
   "version": "1.0.0",
-  "description": "React frontend for ShipSmart tracking microservice",
+  "description": "React frontend for RaphTrack logistics platform",
   "private": true,
   "type": "module",
   "scripts": {
