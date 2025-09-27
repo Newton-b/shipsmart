@@ -142,13 +142,13 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
           }}
           className={`
             w-full flex items-center justify-between px-4 py-4 text-left
-            transition-all duration-200 min-h-[48px]
+            transition-all duration-200 min-h-[56px] touch-manipulation
             ${level > 0 ? 'pl-12 bg-gray-50 dark:bg-gray-800' : ''}
             ${isActive 
               ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-r-4 border-blue-600' 
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
             }
-            active:bg-gray-100 dark:active:bg-gray-700
+            active:bg-gray-100 dark:active:bg-gray-700 active:scale-[0.98]
           `}
         >
           <div className="flex items-center space-x-3">
@@ -188,21 +188,21 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
   return (
     <>
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 shadow-md">
-        <div className="flex items-center justify-between px-4 py-3">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 shadow-lg border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between px-4 py-3 min-h-[60px]">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <Anchor className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">RaphTrack</span>
+            <Anchor className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+            <span className="text-lg font-bold text-gray-900 dark:text-white">RaphTrack</span>
           </div>
 
           {/* Right side buttons */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1">
             {/* Notifications */}
-            <button className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
-              <Bell className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+            <button className="relative p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               {notifications > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                   {notifications}
                 </span>
               )}
@@ -211,12 +211,12 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
             {/* Menu button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+              className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               {isOpen ? (
-                <X className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               ) : (
-                <Menu className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                <Menu className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               )}
             </button>
           </div>
@@ -225,15 +225,15 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
       {/* Mobile Menu Overlay */}
       {isOpen && (
-        <div className="lg:hidden fixed inset-0 z-50">
+        <div className="md:hidden fixed inset-0 z-50">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
+            className="absolute inset-0 bg-black bg-opacity-60 transition-opacity"
             onClick={() => setIsOpen(false)}
           />
           
           {/* Menu Panel */}
-          <div className="absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300 ease-out">
+          <div className="absolute top-0 right-0 h-full w-80 max-w-[90vw] bg-white dark:bg-gray-900 shadow-2xl transform transition-transform duration-300 ease-out overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-2">
@@ -304,7 +304,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
       )}
 
       {/* Spacer for fixed header */}
-      <div className="lg:hidden h-16" />
+      <div className="md:hidden h-[60px]" />
     </>
   );
 };

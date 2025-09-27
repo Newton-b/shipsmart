@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Eye, EyeOff, User, Building, Phone, ArrowRight, AlertCircle, Shield } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, Building, Phone, ArrowRight, AlertCircle, Shield, CheckCircle } from 'lucide-react';
 import { useAuth, UserRole } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { socialLoginService } from '../services/authService';
 
 interface RegisterProps {
   onQuoteClick: () => void;
@@ -151,14 +152,100 @@ export const Register: React.FC<RegisterProps> = ({ onQuoteClick, onContactClick
     }
   };
 
-  const handleGoogleSignup = () => {
-    console.log('Google signup clicked');
-    alert('Google signup would be implemented here. This redirects to Google OAuth.');
+  const handleGoogleSignup = async () => {
+    console.log('🔵 Google signup button clicked!');
+    setIsLoading(true);
+    setErrors({}); // Clear any existing errors
+    
+    try {
+      const result = await socialLoginService.loginWithGoogle();
+      
+      if (result.success && result.user && result.token) {
+        // User already exists, redirect to login
+        console.log('✅ Google user already exists, redirecting to login');
+        navigate('/login', { 
+          state: { 
+            message: 'Account already exists. Please sign in with your Google account.',
+            email: result.user.email
+          }
+        });
+      } else if (result.requiresRegistration && result.user) {
+        // New user, pre-fill form with Google data
+        console.log('📝 New Google user, pre-filling registration form');
+        setFormData(prev => ({
+          ...prev,
+          firstName: result.user.firstName || '',
+          lastName: result.user.lastName || '',
+          email: result.user.email || '',
+          // Keep other fields for user to fill
+        }));
+        
+        // Show success message
+        setErrors({ 
+          success: 'Google account connected! Please complete your registration below.' 
+        });
+      } else {
+        // Login failed
+        setErrors({ 
+          general: result.error || 'Google signup failed. Please try again or use email registration.' 
+        });
+      }
+    } catch (error) {
+      console.error('Google signup failed:', error);
+      setErrors({ 
+        general: 'Google signup failed. Please check your internet connection and try again.' 
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleFacebookSignup = () => {
-    console.log('Facebook signup clicked');
-    alert('Facebook signup would be implemented here. This redirects to Facebook OAuth.');
+  const handleFacebookSignup = async () => {
+    console.log('🔵 Facebook signup button clicked!');
+    setIsLoading(true);
+    setErrors({}); // Clear any existing errors
+    
+    try {
+      const result = await socialLoginService.loginWithFacebook();
+      
+      if (result.success && result.user && result.token) {
+        // User already exists, redirect to login
+        console.log('✅ Facebook user already exists, redirecting to login');
+        navigate('/login', { 
+          state: { 
+            message: 'Account already exists. Please sign in with your Facebook account.',
+            email: result.user.email
+          }
+        });
+      } else if (result.requiresRegistration && result.user) {
+        // New user, pre-fill form with Facebook data
+        console.log('📝 New Facebook user, pre-filling registration form');
+        setFormData(prev => ({
+          ...prev,
+          firstName: result.user.firstName || '',
+          lastName: result.user.lastName || '',
+          email: result.user.email || '',
+          // Keep other fields for user to fill
+        }));
+        
+        // Show success message
+        setErrors({ 
+          success: 'Facebook account connected! Please complete your registration below.' 
+        });
+      } else {
+        // Login failed
+        setErrors({ 
+          general: result.error || 'Facebook signup failed. Please try again or use email registration.' 
+        });
+      }
+    } catch (error) {
+      console.error('Facebook signup failed:', error);
+      setErrors({ 
+        general: 'Facebook signup failed. Please check your internet connection and try again.' 
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -181,6 +268,16 @@ export const Register: React.FC<RegisterProps> = ({ onQuoteClick, onContactClick
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Success Message Display */}
+            {errors.success && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                  <p className="text-green-700 text-sm">{errors.success}</p>
+                </div>
+              </div>
+            )}
+
             {/* General Error Display */}
             {errors.general && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
