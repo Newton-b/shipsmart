@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle, Truck, Shield } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle, Truck, Shield, Loader2 } from 'lucide-react';
 import { useAuth, UserRole } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { emailService, socialLoginService } from '../services/authService';
 
 interface LoginProps {
   onQuoteClick: () => void;
@@ -136,52 +137,55 @@ export const Login: React.FC<LoginProps> = ({ onQuoteClick, onContactClick, onNa
   const handleGoogleLogin = async () => {
     console.log('🔵 Google login button clicked!');
     setIsLoading(true);
+    setErrors({}); // Clear any existing errors
+    
     try {
-      // Simulate Google OAuth flow
-      console.log('⏳ Initiating Google OAuth...');
+      const result = await socialLoginService.loginWithGoogle();
       
-      // In a real implementation, you would:
-      // 1. Redirect to Google OAuth URL
-      // 2. Handle the callback with authorization code
-      // 3. Exchange code for access token
-      // 4. Get user info from Google API
-      // 5. Create or login user in your system
-      
-      // For now, simulate the OAuth flow
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Simulate successful Google login
-      const googleUser = {
-        email: 'user@gmail.com',
-        firstName: 'Google',
-        lastName: 'User',
-        avatar: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
-        provider: 'google'
-      };
-      
-      // Create a mock login result
-      const result = await login({
-        email: googleUser.email,
-        password: 'google-oauth-token', // In real app, this would be handled differently
-        role: 'shipper', // Default role for OAuth users
-        rememberMe: true
-      });
-      
-      if (result.success) {
-        // Redirect OAuth users to shipper dashboard (default for social login)
-        navigate('/shipper', { replace: true });
-      } else {
-        // If user doesn't exist, redirect to registration with pre-filled Google data
+      if (result.success && result.user && result.token) {
+        // User exists and login successful
+        console.log('✅ Google login successful!', result.user);
+        
+        // Use the existing login function with the social user data
+        const loginResult = await login({
+          email: result.user.email,
+          password: 'social-login-token', // Special token for social logins
+          role: result.user.role || 'shipper',
+          rememberMe: true
+        });
+        
+        if (loginResult.success) {
+          // Redirect to appropriate dashboard
+          const redirectPath = result.user.role === 'system_administrator' ? '/admin' : 
+                              result.user.role === 'carrier' ? '/carrier' :
+                              result.user.role === 'driver' ? '/driver' :
+                              result.user.role === 'dispatcher' ? '/dispatcher' :
+                              result.user.role === 'customer_service' ? '/customer-service' :
+                              result.user.role === 'finance' ? '/finance' : '/shipper';
+          
+          navigate(redirectPath, { replace: true });
+        }
+      } else if (result.requiresRegistration && result.user) {
+        // User doesn't exist, redirect to registration with pre-filled data
+        console.log('📝 Google user needs to complete registration');
         navigate('/register', { 
           state: { 
-            googleUser,
-            message: 'Complete your registration to continue with Google account'
+            socialUser: result.user,
+            provider: 'google',
+            message: 'Complete your registration to continue with your Google account'
           }
+        });
+      } else {
+        // Login failed
+        setErrors({ 
+          general: result.error || 'Google login failed. Please try again or use email/password.' 
         });
       }
     } catch (error) {
       console.error('Google login failed:', error);
-      setErrors({ general: 'Google login failed. Please try again or use email/password.' });
+      setErrors({ 
+        general: 'Google login failed. Please check your internet connection and try again.' 
+      });
     } finally {
       setIsLoading(false);
     }
@@ -190,62 +194,99 @@ export const Login: React.FC<LoginProps> = ({ onQuoteClick, onContactClick, onNa
   const handleFacebookLogin = async () => {
     console.log('🔵 Facebook login button clicked!');
     setIsLoading(true);
+    setErrors({}); // Clear any existing errors
+    
     try {
-      // Simulate Facebook OAuth flow
-      console.log('⏳ Initiating Facebook OAuth...');
+      const result = await socialLoginService.loginWithFacebook();
       
-      // In a real implementation, you would:
-      // 1. Initialize Facebook SDK
-      // 2. Call FB.login() with required permissions
-      // 3. Get user profile data
-      // 4. Create or login user in your system
-      
-      // For now, simulate the OAuth flow
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Simulate successful Facebook login
-      const facebookUser = {
-        email: 'user@facebook.com',
-        firstName: 'Facebook',
-        lastName: 'User',
-        avatar: 'https://graph.facebook.com/me/picture?type=large',
-        provider: 'facebook'
-      };
-      
-      // Create a mock login result
-      const result = await login({
-        email: facebookUser.email,
-        password: 'facebook-oauth-token', // In real app, this would be handled differently
-        role: 'shipper', // Default role for OAuth users
-        rememberMe: true
-      });
-      
-      if (result.success) {
-        // Redirect OAuth users to shipper dashboard (default for social login)
-        navigate('/shipper', { replace: true });
-      } else {
-        // If user doesn't exist, redirect to registration with pre-filled Facebook data
+      if (result.success && result.user && result.token) {
+        // User exists and login successful
+        console.log('✅ Facebook login successful!', result.user);
+        
+        // Use the existing login function with the social user data
+        const loginResult = await login({
+          email: result.user.email,
+          password: 'social-login-token', // Special token for social logins
+          role: result.user.role || 'shipper',
+          rememberMe: true
+        });
+        
+        if (loginResult.success) {
+          // Redirect to appropriate dashboard
+          const redirectPath = result.user.role === 'system_administrator' ? '/admin' : 
+                              result.user.role === 'carrier' ? '/carrier' :
+                              result.user.role === 'driver' ? '/driver' :
+                              result.user.role === 'dispatcher' ? '/dispatcher' :
+                              result.user.role === 'customer_service' ? '/customer-service' :
+                              result.user.role === 'finance' ? '/finance' : '/shipper';
+          
+          navigate(redirectPath, { replace: true });
+        }
+      } else if (result.requiresRegistration && result.user) {
+        // User doesn't exist, redirect to registration with pre-filled data
+        console.log('📝 Facebook user needs to complete registration');
         navigate('/register', { 
           state: { 
-            facebookUser,
-            message: 'Complete your registration to continue with Facebook account'
+            socialUser: result.user,
+            provider: 'facebook',
+            message: 'Complete your registration to continue with your Facebook account'
           }
+        });
+      } else {
+        // Login failed
+        setErrors({ 
+          general: result.error || 'Facebook login failed. Please try again or use email/password.' 
         });
       }
     } catch (error) {
       console.error('Facebook login failed:', error);
-      setErrors({ general: 'Facebook login failed. Please try again or use email/password.' });
+      setErrors({ 
+        general: 'Facebook login failed. Please check your internet connection and try again.' 
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleForgotPassword = () => {
+  const handleForgotPassword = async () => {
     const email = formData.email || prompt('Please enter your email address:');
-    if (email) {
-      console.log('Password reset requested for:', email);
-      alert(`Password reset link would be sent to ${email}. Check your email inbox.`);
-      // In a real app: call password reset API
+    if (!email) return;
+
+    // Validate email format
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setErrors({ general: 'Please enter a valid email address.' });
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      console.log('🔄 Sending password reset email to:', email);
+      const result = await emailService.sendPasswordResetEmail(email);
+      
+      if (result.success) {
+        // Show success message
+        setErrors({ 
+          success: result.message 
+        });
+        
+        // Update form data with the email if it was entered via prompt
+        if (!formData.email) {
+          setFormData(prev => ({ ...prev, email }));
+        }
+      } else {
+        setErrors({ 
+          general: result.error || 'Failed to send password reset email. Please try again.' 
+        });
+      }
+    } catch (error) {
+      console.error('Password reset failed:', error);
+      setErrors({ 
+        general: 'Failed to send password reset email. Please check your internet connection and try again.' 
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -281,6 +322,16 @@ export const Login: React.FC<LoginProps> = ({ onQuoteClick, onContactClick, onNa
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Success Message Display */}
+            {errors.success && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                  <p className="text-green-700 text-sm">{errors.success}</p>
+                </div>
+              </div>
+            )}
+
             {/* General Error Display */}
             {errors.general && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">

@@ -54,7 +54,7 @@ export const FreightHero: React.FC<FreightHeroProps> = ({ onQuoteClick, onLearnM
   };
 
   return (
-    <div className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 overflow-hidden">
+    <div className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 overflow-hidden min-h-screen lg:min-h-[80vh]">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -101,7 +101,6 @@ export const FreightHero: React.FC<FreightHeroProps> = ({ onQuoteClick, onLearnM
           />
           <path
             d="M 100,400 Q 400,200 800,350"
-            stroke="rgba(147, 197, 253, 0.2)"
             strokeWidth="1"
             fill="none"
             className="animate-draw-line-delayed"
@@ -109,29 +108,30 @@ export const FreightHero: React.FC<FreightHeroProps> = ({ onQuoteClick, onLearnM
         </svg>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      {/* Main Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-20">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100vh-8rem)] lg:min-h-auto">
           {/* Left Column - Content */}
-          <div className="text-white">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+          <div className="text-white text-center lg:text-left">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6">
               Your Global Supply Chain,
-              <span className="text-blue-300"> All in One Platform</span>
+              <span className="text-blue-300 block sm:inline"> All in One Platform</span>
             </h1>
-            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+            <p className="text-lg sm:text-xl text-blue-100 mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
               From factory floor to customer door. Ocean & Air Freight, Customs Clearance, 
               and Real-time Tracking with unparalleled visibility and control.
             </p>
 
             {/* Animated Stats */}
-            <div className="grid grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
               {animatedStats.map((stat, index) => (
                 <div key={index} className={`text-center transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`} style={{ transitionDelay: `${index * 200}ms` }}>
-                  <div className="bg-blue-800/50 rounded-lg p-4 hover:bg-blue-700/50 transition-colors cursor-pointer group">
-                    <stat.icon className="h-8 w-8 text-blue-300 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                    <div className="text-2xl font-bold text-white">
+                  <div className="bg-blue-800/50 rounded-lg p-3 sm:p-4 hover:bg-blue-700/50 transition-colors cursor-pointer group">
+                    <stat.icon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-300 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                    <div className="text-xl sm:text-2xl font-bold text-white">
                       {stat.target === 99.9 ? stat.value.toFixed(1) : Math.floor(stat.value)}{stat.suffix}
                     </div>
-                    <div className="text-sm text-blue-200">{stat.label}</div>
+                    <div className="text-xs sm:text-sm text-blue-200">{stat.label}</div>
                   </div>
                 </div>
               ))}

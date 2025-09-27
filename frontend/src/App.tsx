@@ -61,6 +61,7 @@ import ScrollToTop from './components/ScrollToTop';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import CookiePolicy from './pages/CookiePolicy';
+import { ResetPassword } from './pages/ResetPassword';
 
 function App() {
   return (
@@ -585,6 +586,9 @@ const AppContent: React.FC = () => {
             <FreightFooter onContactClick={handleContactClick} onNavigate={handleNavigate} onPageNavigate={(page) => navigate(`/${page}`)} />
           </>
         } />
+
+        {/* Password Reset Page */}
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Redirect unknown routes to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
